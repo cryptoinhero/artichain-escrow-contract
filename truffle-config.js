@@ -15,13 +15,13 @@ module.exports = {
      port: 7545,
      network_id: "*"
    },
-   bscMainnet: {
+   bscTestnet: {
     provider: function() {
       return new HDWalletProvider(process.env.privatekey, "https://data-seed-prebsc-2-s3.binance.org:8545");
     },
     network_id: "97"
    },
-   bscTestnet: {
+   bscMainnet: {
     provider: function() {
       return new HDWalletProvider(process.env.privatekey, "https://bsc-dataseed1.ninicoin.io");
     },
