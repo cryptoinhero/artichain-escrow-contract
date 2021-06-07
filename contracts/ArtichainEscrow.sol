@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import '@pancakeswap/pancake-swap-lib/contracts/math/SafeMath.sol';
 import '@pancakeswap/pancake-swap-lib/contracts/token/BEP20/IBEP20.sol';
-// import '@pancakeswap/pancake-swap-lib/contracts/access/Ownable.sol';
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ArtichainEscrow is OwnableUpgradeable {
@@ -71,7 +70,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
     }
     function _authorizeUpgrade(address newImplementation) internal {}
     
-    function deposit(uint256 _amount) public {
+    function deposit(uint256 _amount) external {
         require(_amount > 0, "Invalid amount");
         require(token.transferFrom(msg.sender, address(this), _amount));
 
@@ -86,7 +85,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         emit Deposited(msg.sender, _amount);
     }
 
-    function withdraw(uint256 _amount) public {
+    function withdraw(uint256 _amount) external {
         require(balances[msg.sender] >= _amount && _amount > 0);
         
         if(depositFee > 0) {
@@ -103,7 +102,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         emit Withdrawn(msg.sender, _amount);
     }
 
-    function createPayment(uint _paymentType, address _seller, uint256 _amount, bool _recursive, uint256 _delay, string memory _code) public {
+    function createPayment(uint _paymentType, address _seller, uint256 _amount, bool _recursive, uint256 _delay, string memory _code) external {
         require(_amount > 0, "Invalid Amount");
         require(balances[msg.sender] >= _amount, "Insufficient balance");
         require(_delay > 0, "delay should be greater than 0");
@@ -132,7 +131,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         emit PaymentCreated(_orderId, _paymentType, msg.sender, _seller, _amount, isRecursive, _delay, _code, block.timestamp);
     }
 
-    function disputePayment(uint256 _orderId) public {
+    function disputePayment(uint256 _orderId) external {
         require(professionalPayments[_orderId].buyer != address(0), "OrderID is invalid");
 
         Payment memory _payment = professionalPayments[_orderId];
@@ -147,7 +146,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         emit PaymentDisputed(msg.sender, _orderId);
     }
 
-    function resolveDispute(uint256 _orderId) public onlyOwner returns (bool) {
+    function resolveDispute(uint256 _orderId) external onlyOwner returns (bool) {
         require(professionalPayments[_orderId].buyer != address(0), "OrderID is invalid");
 
         Payment  memory _payment = professionalPayments[_orderId];
@@ -160,7 +159,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         return true;
     }
 
-    function cancelPayment(uint256 _orderId) public {
+    function cancelPayment(uint256 _orderId) external {
         require(personalPayments[_orderId].buyer != address(0), "OrderID is invalid");
 
         Payment memory _payment = personalPayments[_orderId];
@@ -175,7 +174,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         emit PaymentCancelled(_payment.buyer, _orderId);
     }
 
-    function releasePayment(uint256 _orderId, uint _paymentType) public {
+    function releasePayment(uint256 _orderId, uint _paymentType) external {
         require(_paymentType < 2, "Invalid request");
 
         if(_paymentType == 0) {
@@ -191,7 +190,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         _paymentRelease(_orderId, _paymentType);
     }
 
-    function releasePaymentRequest(uint256 _orderId, uint _paymentType) public {
+    function releasePaymentRequest(uint256 _orderId, uint _paymentType) external {
         require(allowReleaseRequest == true, "Request to release a payment is denied");
         require(_paymentType < 2, "Invalid request");
 
@@ -243,7 +242,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         }
     }
 
-    function unlockPayment(uint256 _orderId, string memory _code) public {
+    function unlockPayment(uint256 _orderId, string memory _code) external {
         require(lockedPayments[msg.sender].length > 0, "Locked payment not found");
 
         for(uint i = 0; i < lockedPayments[msg.sender].length; i++) {
@@ -267,7 +266,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         }
     }
 
-    function balanceOf(address _address) public view returns (uint256, uint256, uint256) {
+    function balanceOf(address _address) external view returns (uint256, uint256, uint256) {
         uint256 available = 0;
         if(balances[_address] != 0) {
             available = balances[_address];
@@ -295,7 +294,7 @@ contract ArtichainEscrow is OwnableUpgradeable {
         return (available, locked, disputed);
     }
 
-    function balance() public view returns (uint256, uint256, uint256) {
+    function balance() external view returns (uint256, uint256, uint256) {
         uint256 available = 0;
         if(balances[msg.sender] != 0) {
             available = balances[msg.sender];
@@ -329,11 +328,11 @@ contract ArtichainEscrow is OwnableUpgradeable {
         withdrawFee = _withdrawFee;
     }
 
-    function setWallet(address _wallet) public {
+    function setWallet(address _wallet) external {
         require(wallet == msg.sender, "setWallet: Forbidden");
         wallet = _wallet;
     }
-    function setReleaseReqStatus(bool _allowable) public onlyOwner {
+    function setReleaseReqStatus(bool _allowable) external onlyOwner {
         allowReleaseRequest = _allowable;
     }
 }
