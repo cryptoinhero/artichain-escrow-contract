@@ -8,7 +8,7 @@ module.exports = async function(deployer) {
     const instance = await deployProxy(ArtichainEscrow, ["0xe44eB9185f388A296C28c438e98b5daBfA2DC78a", "0xf8A0B66036EC5e5873a97aB0a5C70CfA8a21121B", 0, 0], { deployer });
     console.log('Deployed', instance.address);
   } else {
-    const oldAddress = "0xac53664f2433e379aea46099dff91246085fa63e" // old escrow address
+    const oldAddress = "0x245E856f40e6CDFb1aa2522822125f72BD52EAa4" // old escrow address
     const instance = await upgradeProxy(oldAddress, ArtichainEscrow, { deployer });
     console.log("Upgraded", instance.address);
   }
